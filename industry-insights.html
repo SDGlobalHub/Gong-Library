@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Industry Insights · SD Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:        #0a1628;
+      --navy-mid:    #0f2040;
+      --navy-card:   #142035;
+      --navy-border: #1e3254;
+      --blue:        #0077b5;
+      --blue-light:  #0a8fd1;
+      --blue-dim:    rgba(0,119,181,0.15);
+      --teal:        #00a0dc;
+      --white:       #ffffff;
+      --off-white:   #e8f4fd;
+      --gray:        #94a3b8;
+      --gray-mid:    #64748b;
+      --text:        #cbd5e1;
+      --text-dim:    #64748b;
+      --radius:      12px;
+      --radius-sm:   8px;
+      --transition:  0.2s ease;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV — matches Gong Library exactly ─────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,22,40,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--navy-border);
+      padding: 0 32px;
+      display: flex; align-items: center; gap: 8px;
+      height: 52px;
+    }
+    .nav-brand {
+      font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+      color: var(--off-white); text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .nav-divider { color: var(--navy-border); margin: 0 4px; }
+    .nav-links { display: flex; gap: 4px; margin-left: 8px; }
+    .nav-link {
+      font-size: 13px; font-weight: 500; color: var(--gray);
+      text-decoration: none; padding: 6px 14px; border-radius: 6px;
+      transition: background var(--transition), color var(--transition);
+      white-space: nowrap;
+    }
+    .nav-link:hover { background: var(--blue-dim); color: var(--white); }
+    .nav-link.active {
+      background: var(--blue-dim); color: var(--teal);
+    }
+    .nav-spacer { flex: 1; }
+    .nav-updated {
+      font-size: 11px; color: var(--text-dim); white-space: nowrap;
+    }
+
+    /* ── HERO ───────────────────────────────────────────────────────── */
+    .hero {
+      padding: 56px 32px 40px;
+      max-width: 1140px; margin: 0 auto;
+    }
+    .hero-eyebrow {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--teal);
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800; line-height: 1.15;
+      color: var(--white); margin-bottom: 16px;
+    }
+    .hero p {
+      font-size: 16px; color: var(--text); max-width: 640px;
+      line-height: 1.65; margin-bottom: 36px;
+    }
+
+    /* ── STATS ROW ──────────────────────────────────────────────────── */
+    .stats-row {
+      display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 0;
+    }
+    .stat {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .stat-num {
+      font-size: 26px; font-weight: 800; color: var(--white);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 12px; color: var(--text-dim); letter-spacing: 0.02em;
+    }
+    .stat-divider {
+      width: 1px; background: var(--navy-border);
+      align-self: stretch; margin: 0 8px;
+    }
+
+    /* ── FILTER BAR ─────────────────────────────────────────────────── */
+    .filter-bar {
+      background: var(--navy-mid);
+      border-top: 1px solid var(--navy-border);
+      border-bottom: 1px solid var(--navy-border);
+      padding: 0 32px;
+      position: sticky; top: 52px; z-index: 90;
+    }
+    .filter-inner {
+      max-width: 1140px; margin: 0 auto;
+      display: flex; gap: 0; align-items: stretch;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .filter-inner::-webkit-scrollbar { display: none; }
+    .filter-group {
+      display: flex; align-items: center; gap: 0;
+      padding: 10px 0; flex-shrink: 0;
+    }
+    .filter-group + .filter-group {
+      margin-left: 24px; padding-left: 24px;
+      border-left: 1px solid var(--navy-border);
+    }
+    .filter-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-right: 8px; white-space: nowrap;
+    }
+    .filter-pills { display: flex; gap: 4px; flex-wrap: nowrap; }
+    .pill {
+      font-size: 12px; font-weight: 500; padding: 4px 12px;
+      border-radius: 20px; cursor: pointer; white-space: nowrap;
+      border: 1px solid transparent;
+      background: transparent; color: var(--gray);
+      transition: all var(--transition);
+    }
+    .pill:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    .pill.active {
+      background: var(--blue-dim); color: var(--teal);
+      border-color: rgba(0,119,181,0.35);
+    }
+
+    /* ── RESULTS BAR ────────────────────────────────────────────────── */
+    .results-bar {
+      max-width: 1140px; margin: 0 auto;
+      padding: 20px 32px 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .results-label {
+      font-size: 13px; font-weight: 600; color: var(--white);
+    }
+    .results-count {
+      font-size: 12px; color: var(--text-dim);
+    }
+
+    /* ── GRID ───────────────────────────────────────────────────────── */
+    .grid {
+      max-width: 1140px; margin: 0 auto;
+      padding: 0 32px 64px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── INDUSTRY CARD ──────────────────────────────────────────────── */
+    .card {
+      background: var(--navy-card);
+      border: 1px solid var(--navy-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+      animation: fadeUp 0.35s ease both;
+    }
+    .card:hover {
+      border-color: rgba(0,119,181,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card-accent {
+      height: 3px;
+      background: var(--accent-color, var(--blue));
+    }
+    .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+
+    /* Header row */
+    .card-header { display: flex; align-items: flex-start; gap: 12px; }
+    .card-icon {
+      width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      background: var(--blue-dim);
+    }
+    .card-meta { flex: 1; }
+    .card-title {
+      font-size: 15px; font-weight: 700; color: var(--white);
+      line-height: 1.3; margin-bottom: 3px;
+    }
+    .card-sub {
+      font-size: 11px; color: var(--text-dim); letter-spacing: 0.02em;
+    }
+    .card-region-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
+      background: var(--blue-dim); color: var(--teal);
+      border: 1px solid rgba(0,160,220,0.3);
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* Stat pills */
+    .card-stats {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .card-stat {
+      display: flex; flex-direction: column; gap: 1px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--navy-border);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px; min-width: 0;
+    }
+    .card-stat-val {
+      font-size: 15px; font-weight: 800; color: var(--white);
+      line-height: 1;
+    }
+    .card-stat-lbl {
+      font-size: 10px; color: var(--text-dim); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Roles */
+    .card-section-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .card-roles { display: flex; flex-direction: column; gap: 4px; }
+    .card-role {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .card-role:last-child { border-bottom: none; }
+    .card-role-name { color: var(--text); }
+    .card-role-demand { color: var(--teal); font-weight: 600; font-size: 11px; }
+
+    /* Starter hook */
+    .card-hook {
+      background: rgba(0,119,181,0.08);
+      border: 1px solid rgba(0,119,181,0.2);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+    .card-hook-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 6px;
+    }
+    .card-hook-trigger {
+      display: inline-block; font-size: 10px; font-weight: 600;
+      background: rgba(0,119,181,0.25); color: var(--teal);
+      border-radius: 3px; padding: 2px 7px; margin-bottom: 7px;
+    }
+    .card-hook-text {
+      font-size: 12px; color: var(--off-white); line-height: 1.55;
+      font-style: italic;
+    }
+
+    /* Footer */
+    .card-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--navy-border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-btn {
+      font-size: 12px; font-weight: 600;
+      color: var(--blue-light); text-decoration: none;
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border-radius: 6px;
+      border: 1px solid rgba(0,119,181,0.3);
+      background: var(--blue-dim);
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .card-btn:hover {
+      background: rgba(0,119,181,0.25);
+      border-color: var(--blue);
+      color: var(--white);
+    }
+    .card-btn-ghost {
+      font-size: 12px; font-weight: 500; color: var(--text-dim);
+      text-decoration: none; display: flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all var(--transition);
+    }
+    .card-btn-ghost:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+    .card-btn-spacer { flex: 1; }
+    .card-updated { font-size: 10px; color: var(--text-dim); }
+
+    /* ── EMPTY STATE ────────────────────────────────────────────────── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center; padding: 64px 32px;
+      color: var(--text-dim);
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-msg { font-size: 15px; }
+
+    /* ── FOOTER ─────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--navy-border);
+      padding: 20px 32px;
+      text-align: center;
+      font-size: 12px; color: var(--text-dim);
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .hero { padding: 36px 16px 28px; }
+      .filter-bar { padding: 0 16px; }
+      .results-bar, .grid { padding-left: 16px; padding-right: 16px; }
+      nav { padding: 0 16px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────────────────────────── -->
+<nav>
+  <span class="nav-brand">SD Hub</span>
+  <span class="nav-divider">·</span>
+  <div class="nav-links">
+    <a class="nav-link" href="https://SDGlobalHub.github.io/Gong-Library">Gong Library</a>
+    <a class="nav-link active" href="#">Industry Insights</a>
+  </div>
+  <div class="nav-spacer"></div>
+  <span class="nav-updated">Updated May 2026</span>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <p class="hero-eyebrow">SD Hub · Industry Intelligence</p>
+  <h1>INDUSTRY INSIGHTS</h1>
+  <p>Market size, talent dynamics, key challenges and APAC-specific conversation starters — by industry and region. Know the market before you dial.</p>
+  <div class="stats-row">
+    <div class="stat">
+      <span class="stat-num" id="stat-industries">8</span>
+      <span class="stat-label">Industries covered</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num" id="stat-starters">48</span>
+      <span class="stat-label">Conversation starters</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num" id="stat-regions">3</span>
+      <span class="stat-label">Regions</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">May 2026</span>
+      <span class="stat-label">Data last refreshed</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── FILTER BAR ────────────────────────────────────────────────────── -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <div class="filter-group">
+      <span class="filter-label">Region</span>
+      <div class="filter-pills" id="region-pills">
+        <span class="pill active" data-filter="region" data-val="all">All regions</span>
+        <span class="pill" data-filter="region" data-val="APAC">APAC</span>
+        <span class="pill" data-filter="region" data-val="NAMER">NAMER</span>
+        <span class="pill" data-filter="region" data-val="EMEAL">EMEAL</span>
+        <span class="pill" data-filter="region" data-val="Global">Global</span>
+      </div>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Industry</span>
+      <div class="filter-pills" id="industry-pills">
+        <span class="pill active" data-filter="industry" data-val="all">All industries</span>
+        <span class="pill" data-filter="industry" data-val="Tech &amp; Software">Tech</span>
+        <span class="pill" data-filter="industry" data-val="Financial Services">FinServ</span>
+        <span class="pill" data-filter="industry" data-val="Healthcare &amp; Life Sciences">Healthcare</span>
+        <span class="pill" data-filter="industry" data-val="Professional Services">Prof. Services</span>
+        <span class="pill" data-filter="industry" data-val="Manufacturing &amp; Engineering">Manufacturing</span>
+        <span class="pill" data-filter="industry" data-val="Retail &amp; Consumer Goods">Retail</span>
+        <span class="pill" data-filter="industry" data-val="Education">Education</span>
+        <span class="pill" data-filter="industry" data-val="Government &amp; Public Sector">Government</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RESULTS BAR ────────────────────────────────────────────────────── -->
+<div class="results-bar">
+  <span class="results-label" id="results-label">All industries</span>
+  <span class="results-count" id="results-count">8 briefings</span>
+</div>
+
+<!-- ── GRID ──────────────────────────────────────────────────────────── -->
+<div class="grid" id="cards-grid"></div>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────────── -->
+<footer>SD Hub · Industry Insights · Updated regularly by your enablement team · INDUSTRY INSIGHTS</footer>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+const INDUSTRIES = [
+  {
+    id: "tech",
+    name: "Tech & Software",
+    region: "APAC",
+    icon: "💻",
+    accentColor: "#0077B5",
+    markets: "SG · AU · IN · JP · KR · ID · MY · VN",
+    tagline: "APAC is the world's fastest-growing tech market — with the widest AI skills gap globally.",
+    stats: [
+      { val: "$1.1T",  lbl: "APAC IT market (2024)" },
+      { val: "3.6:1",  lbl: "AI demand vs. supply" },
+      { val: "77%",    lbl: "Can't fill tech roles" },
+      { val: "31d",    lbl: "Median posting duration" },
+    ],
+    roles: [
+      ["GenAI / LLM Engineers",       "↑ 118% YoY"],
+      ["Cloud Architects",            "↑ 63% YoY"],
+      ["Cybersecurity Analysts",      "↑ 51% YoY"],
+      ["Data Engineers",              "↑ 44% YoY"],
+      ["Mobile Engineers (SEA)",      "↑ 37% YoY"],
+    ],
+    hooks: [
+      { trigger: "SEA Data Centre Buildout",    text: "\"With AWS, Google and Microsoft all announcing major APAC data centre investments, what does that do to your cloud engineer pipeline over the next 12 months?\"" },
+      { trigger: "SG ONE Pass (AI & Tech)",     text: "\"With Singapore replacing TechPass with the ONE Pass (AI & Tech) track from Jan 2027, how is your team adjusting your sourcing mix between local and international candidates?\"" },
+      { trigger: "Skills-Based Hiring Shift",   text: "\"APAC tech hiring in 2026 has shifted from job-title matching to skills-based precision — how is your current TA tooling keeping up, or is it still keyword-searching resumes?\"" },
+    ],
+    updated: "May 2026",
+  },
+  {
+    id: "finserv",
+    name: "Financial Services",
+    region: "APAC",
+    icon: "🏦",
+    accentColor: "#1A3C6E",
+    markets: "SG · HK · AU · JP · IN · ID · MY · TH",
+    tagline: "2026 is a 'stress test year' for APAC FS compliance. MAS AI Risk Guidelines + HK Stablecoins Act land simultaneously.",
+    stats: [
+      { val: "$9.8T",  lbl: "APAC FS revenue (2024)" },
+      { val: "4.1x",   lbl: "Compliance demand vs. supply" },
+      { val: "67%",    lbl: "FS employers can't fill roles" },
+      { val: "2026",   lbl: "HK Stablecoins Act live" },
+    ],
+    roles: [
+      ["Risk & Compliance Officers",  "↑ 67% YoY"],
+      ["Digital Asset Compliance",    "New: HK SFC ASPIRe rules"],
+      ["AML / KYC Specialists",       "↑ 58% YoY"],
+      ["Embedded Finance Engineers",  "↑ 71% YoY"],
+      ["AI Governance Specialists",   "New: MAS AIRG Nov 2025"],
+    ],
+    hooks: [
+      { trigger: "MAS AIRG — AI Governance",    text: "\"MAS's AI Risk Management Guidelines shift AI accountability to senior leadership — are you seeing demand for AI governance specialists who have both tech and regulatory backgrounds?\"" },
+      { trigger: "HK Stablecoins Act 2026",     text: "\"With the HK Stablecoins Ordinance live and first issuer licenses expected in 2026, every digital asset firm in Hong Kong suddenly needs licensed compliance officers — how are you sourcing into that market?\"" },
+      { trigger: "SG EP Threshold Rising",      text: "\"With Singapore's EP minimum rising again toward S$6,000, how are you adjusting your international vs. local sourcing mix — and are you building the local pipeline before the threshold locks you out?\"" },
+    ],
+    updated: "May 2026",
+  },
+  {
+    id: "health",
+    name: "Healthcare & Life Sciences",
+    region: "APAC",
+    icon: "🏥",
+    accentColor: "#0A7E6A",
+    markets: "SG · AU · JP · IN · KR · MY · TH · CN",
+    tagline: "Australia faces 100,000+ nurse vacancies. Singapore needs 15,000 more healthcare professionals by 2030. Both compete for the same global talent pool.",
+    stats: [
+      { val: "100K+",  lbl: "AU nurse vacancies by 2025" },
+      { val: "3-4K",   lbl: "SG nurse vacancies in 2026" },
+      { val: "18-22%", lbl: "SG nursing turnover rate" },
+      { val: "63d",    lbl: "Avg. clinical time-to-fill APAC" },
+    ],
+    roles: [
+      ["Clinical Data Scientists",    "↑ 72% YoY APAC"],
+      ["Digital Health PMs",          "↑ 63% YoY"],
+      ["Regulatory Affairs (APAC)",   "↑ 59% YoY"],
+      ["Allied Health Professionals", "15% vacancy rate SG"],
+      ["Critical Care / ICU Nurses",  "Exceptional demand AU/SG"],
+    ],
+    hooks: [
+      { trigger: "AU 100K+ Nurse Shortage",     text: "\"Australia is projecting 100,000+ nurse vacancies right now — how far ahead of that wave is your sourcing pipeline, and are you reaching international candidates before they commit to the UK or Middle East?\"" },
+      { trigger: "SG Competing Internationally", text: "\"Singapore healthcare clusters are losing trained nurses to Australia, the UK, and the Middle East simultaneously — how are you tracking which candidates are being approached and building urgency into your outreach?\"" },
+      { trigger: "AU International Grad Lag",   text: "\"With international medical graduates taking 18-36 months and $20,000+ to get Australian registration, how far ahead is your pipeline — are you building relationships before they even start that process?\"" },
+    ],
+    updated: "May 2026",
+  },
+  {
+    id: "profservices",
+    name: "Professional Services",
+    region: "APAC",
+    icon: "📊",
+    accentColor: "#5B2D8E",
+    markets: "SG · AU · IN · JP · HK · MY · PH · TH",
+    tagline: "APAC consulting attrition is 26% — world's highest. ESG advisory demand up 79% YoY. AI is reshaping delivery models faster than pipelines can respond.",
+    stats: [
+      { val: "26%",    lbl: "Annual attrition APAC consulting" },
+      { val: "79%",    lbl: "ESG advisory demand YoY" },
+      { val: "4%",     lbl: "↑ hiring low-cost APAC (Aon 2026)" },
+      { val: "$1.9T",  lbl: "APAC prof. services market" },
+    ],
+    roles: [
+      ["ESG / Sustainability Advisors", "↑ 79% YoY"],
+      ["AI Strategy Consultants",       "New: AI practice build-out"],
+      ["Digital Transformation Leads",  "↑ 54% YoY"],
+      ["Legal Tech Specialists (SG/HK)","↑ 51% YoY"],
+      ["GCC / Delivery Centre Leaders", "↑ India/PH expansion"],
+    ],
+    hooks: [
+      { trigger: "ESG Mandate Avalanche",       text: "\"SGX ESG disclosure is mandatory and MAS climate risk requirements are tightening — every listed company needs ESG advisory capability. Where is your firm actually finding that talent, because the supply hasn't caught up?\"" },
+      { trigger: "AI Practice Build-Out",       text: "\"Consulting firms across APAC are racing to build AI advisory practices — but talent with both AI expertise and domain knowledge in specific industries is genuinely rare. How are you sourcing for that combination?\"" },
+      { trigger: "26% APAC Attrition",          text: "\"With APAC consulting attrition at 26%, you're effectively rehiring a quarter of your workforce every year. At what point does your pipeline strategy shift from reactive backfill to proactive market mapping?\"" },
+    ],
+    updated: "May 2026",
+  },
+  {
+    id: "manufacturing",
+    name: "Manufacturing & Engineering",
+    region: "APAC",
+    icon: "⚙️",
+    accentColor: "#B45309",
+    markets: "JP · KR · MY · TH · VN · IN · AU · SG",
+    tagline: "Vietnam has 15,000 semiconductor engineers against a 2030 target of 50,000. Malaysia needs 50,000 but graduates only 5,000/yr.",
+    stats: [
+      { val: "15K",    lbl: "VN semiconductor engineers (target: 50K)" },
+      { val: "50K",    lbl: "MY engineer shortfall by 2030" },
+      { val: "77%",    lbl: "APAC manufacturers can't fill roles" },
+      { val: "Mar'25", lbl: "Vietnam's first wafer fab approved" },
+    ],
+    roles: [
+      ["EV / Battery Engineers",         "↑ 97% YoY APAC"],
+      ["Semiconductor Design Engineers", "VN 35K shortfall"],
+      ["Robotics / Automation Specs",    "↑ 68% YoY"],
+      ["Process Engineers (Fab)",        "MY, JP, VN driving demand"],
+      ["Advanced Materials Engineers",   "Coherent VN $127M 2025"],
+    ],
+    hooks: [
+      { trigger: "Vietnam Semiconductor Gap",   text: "\"Vietnam approved its first wafer fab in March 2025 and is targeting 50,000 semiconductor engineers — but only has 15,000 today. That 35,000-person gap doesn't close without sourcing internationally. How are you approaching that pipeline?\"" },
+      { trigger: "Malaysia 50K Shortfall",      text: "\"Malaysia's National Semiconductor Strategy is backed by MYR25 billion but the country graduates fewer than 5,000 engineers a year against a 60,000 target. How are you filling that gap when every other firm is chasing the same candidates?\"" },
+      { trigger: "APAC EV Talent War",          text: "\"Toyota, Hyundai, BYD and VinFast are all scaling EV engineering simultaneously — demand for battery engineers is up 97% YoY, but the candidates have been approached 5+ times already. What's your conversion rate on first outreach?\"" },
+    ],
+    updated: "May 2026",
+  },
+  {
+    id: "retail",
+    name: "Retail & Consumer Goods",
+    region: "APAC",
+    icon: "🛍️",
+    accentColor: "#BE185D",
+    markets: "CN · IN · AU · ID · JP · TH · MY · SG",
+    tagline: "TikTok Shop generated $500M+ in 4 days at BFCM 2025. Global social commerce hit $821B. APAC is both the engine and the talent bottleneck.",
+    stats: [
+      { val: "$821B",  lbl: "Global social commerce (2025)" },
+      { val: "$500M+", lbl: "TikTok Shop BFCM 4-day sales" },
+      { val: "88%",    lbl: "APAC retailers report shortages" },
+      { val: "58%",    lbl: "Annual attrition — APAC retail" },
+    ],
+    roles: [
+      ["Social Commerce Strategists",    "↑ 83% YoY"],
+      ["Livestream Commerce Managers",   "New role type emerging"],
+      ["Creator Economy Partnerships",   "New: brand co-ownership model"],
+      ["Supply Chain & Last-Mile",       "↑ 51% YoY"],
+      ["Sustainability / ESG Leads",     "↑ 71% YoY"],
+    ],
+    hooks: [
+      { trigger: "TikTok Shop $500M BFCM",      text: "\"TikTok Shop generated over $500M in 4 days at Black Friday with 760,000 livestream sessions — the brands that won had full-time Livestream Commerce Managers. Do you have that role in your JD library yet?\"" },
+      { trigger: "Social Commerce New Roles",   text: "\"Social commerce is inventing new job categories — Livestream Commerce Managers, AI Personalisation Specialists, Creator Economy Leads. How are you sourcing for roles that don't have an established talent pool yet?\"" },
+      { trigger: "APAC Frontline Attrition",    text: "\"88% of APAC retailers report frontline shortages and attrition runs at 58% — the highest globally. At what point does your TA strategy shift from perpetual backfill to a forward pipeline?\"" },
+    ],
+    updated: "May 2026",
+  },
+  {
+    id: "education",
+    name: "Education",
+    region: "APAC",
+    icon: "🎓",
+    accentColor: "#1D6A96",
+    markets: "SG · AU · JP · IN · MY · ID · PH · VN",
+    tagline: "International school enrolments up 40% in SG/MY/VN. Australia competing globally for teachers. Bilingual STEM teachers are APAC's most acute gap.",
+    stats: [
+      { val: "820K",   lbl: "Teacher shortage across APAC" },
+      { val: "74%",    lbl: "APAC schools report vacancies" },
+      { val: "40%+",   lbl: "Intl school enrolment growth SG/MY/VN" },
+      { val: "84%",    lbl: "EdTech PM demand growth YoY" },
+    ],
+    roles: [
+      ["EdTech Product Managers",       "↑ 84% YoY — fastest growing"],
+      ["AI in Education Specialists",   "New: AI curriculum + governance"],
+      ["Instructional Designers",       "↑ 63% YoY — corporate L&D"],
+      ["Bilingual STEM Teachers",       "↑ 47% YoY — gap widening"],
+      ["Corporate L&D Strategists",     "New: MNC internal academies"],
+    ],
+    hooks: [
+      { trigger: "SG/MY Intl School Surge",     text: "\"International school enrolments in Singapore and Malaysia are up 40% since 2021 — how is your recruitment team building a bilingual teacher pipeline that can keep pace with that growth, given global competition for those profiles?\"" },
+      { trigger: "Bilingual STEM Gap",          text: "\"A teacher who can deliver Year 10 maths AND instruct in Mandarin or Bahasa is essentially invisible on a job board — how are you building that pipeline, and how many qualified candidates have you found in the last 6 months?\"" },
+      { trigger: "AI in Education",             text: "\"AI is entering classrooms faster than anyone has trained for — AI curriculum designers, EdTech AI governance leads — how are you sourcing for roles that literally have no established talent pool yet?\"" },
+    ],
+    updated: "May 2026",
+  },
+  {
+    id: "government",
+    name: "Government & Public Sector",
+    region: "APAC",
+    icon: "🏛️",
+    accentColor: "#155E75",
+    markets: "SG · AU · JP · IN · MY · ID · TH · PH",
+    tagline: "SG ONE Pass (AI & Tech) replacing TechPass in Jan 2027. SG public sector posted 2,400+ vacancies in July 2025. GovTech demand up 94% YoY.",
+    stats: [
+      { val: "2,400+", lbl: "SG public sector vacancies Jul 2025" },
+      { val: "Jan'27", lbl: "ONE Pass (AI & Tech) launches" },
+      { val: "94%",    lbl: "GovTech demand YoY APAC" },
+      { val: "81d",    lbl: "APAC public sector time-to-hire" },
+    ],
+    roles: [
+      ["GovTech / Digital Officers",      "↑ 94% YoY"],
+      ["AI Governance Officers",          "New: Korea AI Act, VN AI Law"],
+      ["Cybersecurity Analysts (Govt)",   "↑ 77% YoY"],
+      ["Data Scientists (Public Sector)", "↑ 66% YoY"],
+      ["Urban Planning / Smart City",     "↑ 44% YoY"],
+    ],
+    hooks: [
+      { trigger: "SG ONE Pass (AI & Tech)",     text: "\"Singapore just announced it's replacing TechPass with ONE Pass (AI & Tech) from Jan 2027 — a 5-year renewable pass designed to compete for the world's best AI talent. How is your agency positioning to attract those profiles before private sector makes their move?\"" },
+      { trigger: "AI Governance Laws — APAC",   text: "\"South Korea passed its AI Basic Act, Vietnam's AI Law went live March 2026, Indonesia is finalising its AI regulation — every APAC government now needs AI governance officers, but there's almost no established talent pool. How are you approaching that?\"" },
+      { trigger: "81-Day Hiring Cycle",         text: "\"Your hiring process takes 80+ days and a private tech company can make an offer in 10 — how many candidates are you losing mid-funnel to private sector offers, and do you actually track that number?\"" },
+    ],
+    updated: "May 2026",
+  },
+];
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let activeRegion   = "all";
+let activeIndustry = "all";
+
+// ─── FILTER ────────────────────────────────────────────────────────────────
+function getFiltered() {
+  return INDUSTRIES.filter(d => {
+    const regionOk   = activeRegion   === "all" || d.region === activeRegion;
+    const industryOk = activeIndustry === "all" || d.name   === activeIndustry;
+    return regionOk && industryOk;
+  });
+}
+
+// ─── RENDER CARD ───────────────────────────────────────────────────────────
+function renderCard(d, idx) {
+  const hook = d.hooks[0];
+  const delay = (idx % 9) * 0.05;
+
+  return `
+  <div class="card" style="--accent-color:${d.accentColor}; animation-delay:${delay}s;"
+       data-region="${d.region}" data-industry="${d.name}">
+    <div class="card-accent"></div>
+    <div class="card-body">
+
+      <div class="card-header">
+        <div class="card-icon" style="background:${d.accentColor}22;">${d.icon}</div>
+        <div class="card-meta">
+          <div class="card-title">${d.name}</div>
+          <div class="card-sub">${d.markets}</div>
+        </div>
+        <span class="card-region-badge">${d.region}</span>
+      </div>
+
+      <div class="card-stats">
+        ${d.stats.map(s => `
+        <div class="card-stat">
+          <span class="card-stat-val">${s.val}</span>
+          <span class="card-stat-lbl">${s.lbl}</span>
+        </div>`).join("")}
+      </div>
+
+      <div>
+        <div class="card-section-title">Hottest roles</div>
+        <div class="card-roles">
+          ${d.roles.slice(0,4).map(([name, demand]) => `
+          <div class="card-role">
+            <span class="card-role-name">${name}</span>
+            <span class="card-role-demand">${demand}</span>
+          </div>`).join("")}
+        </div>
+      </div>
+
+      <div class="card-hook">
+        <div class="card-hook-label">💬 Conversation starter</div>
+        <span class="card-hook-trigger">${hook.trigger}</span>
+        <p class="card-hook-text">${hook.text}</p>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <a class="card-btn" href="#" onclick="openModal('${d.id}'); return false;">
+        View all 6 starters →
+      </a>
+      <div class="card-btn-spacer"></div>
+      <span class="card-updated">Updated ${d.updated}</span>
+    </div>
+  </div>`;
+}
+
+// ─── RENDER GRID ───────────────────────────────────────────────────────────
+function renderGrid() {
+  const grid    = document.getElementById("cards-grid");
+  const label   = document.getElementById("results-label");
+  const count   = document.getElementById("results-count");
+  const filtered = getFiltered();
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">🎯</div>
+      <p class="empty-msg">No briefings found for this filter.<br>Check back soon — more regions are on the way!</p>
+    </div>`;
+  } else {
+    grid.innerHTML = filtered.map((d, i) => renderCard(d, i)).join("");
+  }
+
+  // Update labels
+  const regionText   = activeRegion   === "all" ? "All regions"    : activeRegion;
+  const industryText = activeIndustry === "all" ? "All industries" : activeIndustry;
+  label.textContent  = industryText === "All industries" ? regionText : industryText;
+  count.textContent  = `${filtered.length} briefing${filtered.length !== 1 ? "s" : ""}`;
+}
+
+// ─── PILL LISTENERS ────────────────────────────────────────────────────────
+document.querySelectorAll(".pill").forEach(pill => {
+  pill.addEventListener("click", () => {
+    const filterType = pill.dataset.filter;
+    const val        = pill.dataset.val;
+
+    // Update active state within group
+    document.querySelectorAll(`.pill[data-filter="${filterType}"]`)
+      .forEach(p => p.classList.remove("active"));
+    pill.classList.add("active");
+
+    if (filterType === "region")   activeRegion   = val;
+    if (filterType === "industry") activeIndustry = val;
+
+    renderGrid();
+  });
+});
+
+// ─── MODAL ─────────────────────────────────────────────────────────────────
+function buildModal() {
+  const el = document.createElement("div");
+  el.id = "modal-overlay";
+  el.style.cssText = `
+    display:none; position:fixed; inset:0; z-index:1000;
+    background:rgba(5,12,28,0.85); backdrop-filter:blur(8px);
+    align-items:center; justify-content:center; padding:24px;
+  `;
+  el.innerHTML = `
+  <div id="modal-box" style="
+    background:#0f2040; border:1px solid #1e3254; border-radius:16px;
+    width:100%; max-width:680px; max-height:90vh; overflow-y:auto;
+    box-shadow:0 24px 64px rgba(0,0,0,0.5);
+  ">
+    <div id="modal-content"></div>
+  </div>`;
+  el.addEventListener("click", e => { if (e.target === el) closeModal(); });
+  document.body.appendChild(el);
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+}
+
+function openModal(id) {
+  const d   = INDUSTRIES.find(x => x.id === id);
+  const box = document.getElementById("modal-content");
+  if (!d || !box) return;
+
+  box.innerHTML = `
+  <div style="padding:24px 28px 8px; border-bottom:1px solid #1e3254; display:flex; align-items:center; gap:12px;">
+    <span style="font-size:24px;">${d.icon}</span>
+    <div style="flex:1;">
+      <div style="font-size:17px; font-weight:700; color:#fff;">${d.name}</div>
+      <div style="font-size:11px; color:#64748b;">${d.region}  ·  ${d.markets}</div>
+    </div>
+    <button onclick="closeModal()" style="background:rgba(255,255,255,0.06); border:1px solid #1e3254;
+      color:#94a3b8; border-radius:8px; padding:6px 12px; cursor:pointer; font-size:13px;">✕ Close</button>
+  </div>
+  <div style="padding:20px 28px 28px; display:flex; flex-direction:column; gap:16px;">
+    <p style="font-size:13px; color:#94a3b8; font-style:italic; border-left:3px solid ${d.accentColor};
+      padding-left:12px; margin:0;">${d.tagline}</p>
+    <div style="font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+      color:#64748b;">6 APAC Conversation Starters</div>
+    ${d.hooks.map((h, i) => `
+    <div style="background:#142035; border:1px solid #1e3254; border-radius:10px; padding:16px;
+      border-left:3px solid ${d.accentColor};">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <span style="width:22px; height:22px; border-radius:6px; background:${d.accentColor};
+          display:flex; align-items:center; justify-content:center;
+          font-size:11px; font-weight:800; color:#fff; flex-shrink:0;">${i+1}</span>
+        <span style="font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+          background:rgba(0,119,181,0.2); color:#00a0dc; border-radius:3px; padding:2px 8px;">
+          ${h.trigger}
+        </span>
+      </div>
+      <p style="font-size:13.5px; color:#e8f4fd; font-style:italic; line-height:1.6; margin:0 0 10px;">
+        ${h.text}
+      </p>
+      ${h.why ? `
+      <div style="border-top:1px solid #1e3254; padding-top:8px; margin-top:2px;">
+        <span style="font-size:10px; font-weight:700; color:${d.accentColor}; letter-spacing:0.08em;">WHY IT WORKS: </span>
+        <span style="font-size:11px; color:#64748b;">${h.why}</span>
+      </div>` : ""}
+    </div>`).join("")}
+  </div>`;
+
+  const overlay = document.getElementById("modal-overlay");
+  overlay.style.display = "flex";
+  setTimeout(() => { overlay.style.opacity = 1; }, 10);
+}
+
+function closeModal() {
+  const overlay = document.getElementById("modal-overlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+// Add why-it-works to hooks
+const whys = {
+  tech: [
+    "Opens with a regional macro trend — invites them to share pipeline pressure before you mention a product.",
+    "Hyper-current March 2026 SG policy trigger. Shows you're tracking regulatory changes they must act on.",
+    "Positions LinkedIn Skills Graph as the answer to a trend they already know is happening.",
+  ],
+  finserv: [
+    "Hyper-current Nov 2025 regulatory trigger. Names a role type that barely exists — opens the Skills Graph conversation.",
+    "Current 2026 HK regulatory context. Opens the digital assets compliance scarcity conversation with genuine market depth.",
+    "March 2026 announcement that every SG FS TA leader is navigating right now. Opens local passive talent discussion.",
+  ],
+  health: [
+    "Confirmed government data makes this impossible to dismiss. Opens the proactive international pipeline conversation.",
+    "Shows SG-specific awareness of a multi-directional talent drain. Opens likely-mover and InMail personalisation.",
+    "Makes the lead time problem visceral. Opens the long-horizon passive pipeline and early engagement conversation.",
+  ],
+  profservices: [
+    "Names specific current regulatory triggers. Opens the scarcity and Skills Graph adjacency conversation.",
+    "Topical in every consulting firm right now. Opens the dual-skill matching and adjacent talent discussion.",
+    "Makes the attrition math stark. Opens the always-on pipeline conversation naturally.",
+  ],
+  manufacturing: [
+    "Specific, current, and structurally unsolvable domestically — opens the global passive sourcing conversation.",
+    "Shows awareness of a specific national strategy and makes the talent math uncomfortable and urgent.",
+    "Makes candidate saturation concrete and quantifiable. Opens quality-of-outreach and Spotlight discussion.",
+  ],
+  retail: [
+    "Specific, current, and verifiable. Creates urgency around a structural hiring gap most retail TA teams haven't solved.",
+    "Opens the Skills Graph conversation around adjacent-skill mapping for genuinely new role types.",
+    "Combines two current stats to make the structural nature of the problem undeniable.",
+  ],
+  education: [
+    "Hyper-local APAC context with current stats. Makes the capacity gap feel urgent before you offer a solution.",
+    "Asking for a number makes the scarcity concrete and opens the global passive sourcing conversation.",
+    "Genuinely new role category. Opens the Skills Graph adjacency conversation in a compelling way.",
+  ],
+  government: [
+    "Current March 2026 announcement. Shows you're tracking policy changes they're actively navigating.",
+    "Three specific 2025-2026 regulatory events. Opens the Skills Graph adjacent-talent conversation.",
+    "Quantifies the cost of bureaucratic speed in a way that lands. Opens the pipeline tools discussion.",
+  ],
+};
+
+INDUSTRIES.forEach(d => {
+  const w = whys[d.id] || [];
+  d.hooks.forEach((h, i) => { h.why = w[i] || ""; });
+});
+
+buildModal();
+renderGrid();
+</script>
+</body>
+</html>
