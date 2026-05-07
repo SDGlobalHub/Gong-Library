@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indeed Competitor Insights — SDR Dashboard</title>
+<style>
+  :root {
+    --li-blue: #0A66C2;
+    --li-blue-dark: #004182;
+    --li-blue-light: #E8F1FB;
+    --indeed: #2164F3;
+    --bg: #F3F2EF;
+    --card: #FFFFFF;
+    --text: #1D2226;
+    --muted: #56687A;
+    --border: #E0E0E0;
+    --green: #057642;
+    --green-bg: #E6F4EE;
+    --red: #B7322C;
+    --red-bg: #FBEAEA;
+    --amber: #915907;
+    --amber-bg: #FEF3D9;
+    --shadow: 0 1px 2px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header.hero {
+    background: linear-gradient(135deg, var(--li-blue-dark) 0%, var(--li-blue) 100%);
+    color: white;
+    padding: 32px 24px 24px;
+  }
+  .hero-inner { max-width: 1280px; margin: 0 auto; }
+  .breadcrumb {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    opacity: .85;
+    margin-bottom: 8px;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .subtitle { font-size: 16px; opacity: .92; margin: 0 0 24px; max-width: 700px; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .stat {
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .stat-num { font-size: 24px; font-weight: 700; line-height: 1.1; }
+  .stat-label { font-size: 12px; opacity: .85; margin-top: 4px; }
+
+  .controls {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .controls-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 220px;
+    position: relative;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    font-size: 14px;
+    background: var(--bg);
+    transition: border-color .15s, background .15s;
+  }
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--li-blue);
+    background: white;
+  }
+  .search-box::before {
+    content: "🔍";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    opacity: .6;
+  }
+  .region-filter {
+    display: inline-flex;
+    background: var(--bg);
+    border-radius: 24px;
+    padding: 3px;
+    border: 1px solid var(--border);
+  }
+  .region-filter button {
+    border: none;
+    background: transparent;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 22px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all .15s;
+  }
+  .region-filter button.active {
+    background: var(--li-blue);
+    color: white;
+    box-shadow: 0 1px 4px rgba(10,102,194,.3);
+  }
+
+  .tabs {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    overflow-x: auto;
+  }
+  .tabs-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    gap: 4px;
+  }
+  .tab {
+    border: none;
+    background: transparent;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: color .15s, border-color .15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--li-blue);
+    border-bottom-color: var(--li-blue);
+  }
+  .tab-count {
+    display: inline-block;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+    font-weight: 600;
+  }
+  .tab.active .tab-count {
+    background: var(--li-blue-light);
+    color: var(--li-blue);
+  }
+
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .card h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+  .badge-fr { background: #EEF2FF; color: #2C3E91; }
+  .badge-uki { background: #FEF3D9; color: var(--amber); }
+  .badge-both { background: var(--li-blue-light); color: var(--li-blue); }
+
+  .card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+  .card p { margin: 0 0 8px; font-size: 14px; color: var(--text); }
+  .card .quote {
+    background: var(--li-blue-light);
+    border-left: 3px solid var(--li-blue);
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--li-blue-dark);
+    font-style: italic;
+  }
+  .card .evidence {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .card .evidence::before { content: "🎙"; }
+
+  .compare-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .compare-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-top: 1px solid var(--border);
+  }
+  .compare-row:first-child { border-top: none; background: var(--bg); }
+  .compare-row > div { padding: 14px 18px; font-size: 14px; }
+  .compare-row > div:first-child { font-weight: 600; color: var(--muted); border-right: 1px solid var(--border); }
+  .compare-row > div:nth-child(2) { color: var(--text); border-right: 1px solid var(--border); background: rgba(255,235,235,.3); }
+  .compare-row > div:nth-child(3) { color: var(--text); background: rgba(232,241,251,.4); font-weight: 500; }
+  .compare-row:first-child > div { font-weight: 700; text-align: center; }
+  .compare-row:first-child > div:nth-child(2) { color: var(--indeed); background: var(--bg); }
+  .compare-row:first-child > div:nth-child(3) { color: var(--li-blue); background: var(--bg); }
+
+  .section-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    font-weight: 700;
+    margin: 0 0 12px;
+  }
+
+  .dos-donts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .list-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .list-card h3 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .list-card.dos h3 { color: var(--green); }
+  .list-card.donts h3 { color: var(--red); }
+  .list-card ul { margin: 0; padding-left: 0; list-style: none; }
+  .list-card li {
+    padding: 10px 0 10px 28px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    position: relative;
+  }
+  .list-card li:last-child { border-bottom: none; }
+  .list-card.dos li::before {
+    content: "✓";
+    position: absolute;
+    left: 4px;
+    top: 10px;
+    color: var(--green);
+    font-weight: 700;
+  }
+  .list-card.donts li::before {
+    content: "✕";
+    position: absolute;
+    left: 4px;
+    top: 10px;
+    color: var(--red);
+    font-weight: 700;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    background: white;
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+  }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 24px; }
+    .dos-donts { grid-template-columns: 1fr; }
+    .compare-row { grid-template-columns: 1fr; }
+    .compare-row > div { border-right: none !important; border-top: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb">SDR Enablement · Q3 FY26</div>
+    <h1>Indeed Competitive Insights</h1>
+    <p class="subtitle">Everything you need to handle Indeed in prospecting calls — differentiators, objections, discovery questions, and proof points sourced from real customer conversations.</p>
+    <div class="stats">
+      <div class="stat"><div class="stat-num">37M</div><div class="stat-label">LinkedIn users in France (vs 10M Indeed)</div></div>
+      <div class="stat"><div class="stat-num">70%</div><div class="stat-label">Of workforce is passive — only on LinkedIn</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">LinkedIn relevant applications (vs 20% Indeed)</div></div>
+      <div class="stat"><div class="stat-num">85%</div><div class="stat-label">Time-to-hire reduction (4–5 mo → 2–3 wk)</div></div>
+      <div class="stat"><div class="stat-num">£5K</div><div class="stat-label">Customer monthly Indeed spend uncovered</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-box">
+      <input id="search" type="search" placeholder="Search differentiators, objections, talk tracks…" />
+    </div>
+    <div class="region-filter" role="tablist">
+      <button data-region="all" class="active">All Regions</button>
+      <button data-region="fr">🇫🇷 France</button>
+      <button data-region="uki">🇬🇧 UK &amp; Ireland</button>
+    </div>
+  </div>
+</div>
+
+<nav class="tabs">
+  <div class="tabs-inner" id="tabs"></div>
+</nav>
+
+<main>
+  <section class="panel active" data-panel="overview">
+    <h2 class="section-title">Indeed vs LinkedIn — at a glance</h2>
+    <div class="compare-table">
+      <div class="compare-row"><div>Dimension</div><div>Indeed</div><div>LinkedIn</div></div>
+      <div class="compare-row"><div>Audience</div><div>Active job seekers</div><div>Active + 70% passive talent</div></div>
+      <div class="compare-row"><div>Network (France)</div><div>10M users</div><div>37M users (≈3.7×)</div></div>
+      <div class="compare-row"><div>Pricing model</div><div>Pay-per-click — variable</div><div>Fixed annual job slots</div></div>
+      <div class="compare-row"><div>Application quality</div><div>~10–20% relevant</div><div>~100% relevant via algorithm</div></div>
+      <div class="compare-row"><div>Sourcing</div><div>Passive job posting only</div><div>Proactive headhunting + 44 filters</div></div>
+      <div class="compare-row"><div>Visibility</div><div>Bidding war — biggest budget wins</div><div>Algorithm-matched, level playing field</div></div>
+      <div class="compare-row"><div>Sweet spot</div><div>Entry-level, blue-collar, high volume</div><div>Skilled, professional, senior, niche</div></div>
+    </div>
+
+    <h2 class="section-title">Indeed weaknesses to probe</h2>
+    <div class="grid" id="weaknesses"></div>
+  </section>
+
+  <section class="panel" data-panel="differentiators">
+    <div class="grid" id="differentiators"></div>
+  </section>
+
+  <section class="panel" data-panel="objections">
+    <div class="grid" id="objections"></div>
+  </section>
+
+  <section class="panel" data-panel="discovery">
+    <div class="grid" id="discovery"></div>
+  </section>
+
+  <section class="panel" data-panel="proof">
+    <div class="grid" id="proof"></div>
+  </section>
+
+  <section class="panel" data-panel="ctas">
+    <div class="grid" id="ctas"></div>
+  </section>
+
+  <section class="panel" data-panel="rules">
+    <div class="dos-donts">
+      <div class="list-card dos">
+        <h3>✓ Do</h3>
+        <ul>
+          <li>Acknowledge Indeed's strengths (active seekers, high-volume roles)</li>
+          <li>Position LinkedIn as complementary first, then a replacement</li>
+          <li>Use questions to surface Indeed pain — never criticize directly</li>
+          <li>Focus on outcomes: time-to-hire, cost-per-qualified-candidate, quality</li>
+          <li>Create curiosity about LinkedIn's unique capabilities (passive, targeting)</li>
+          <li>Transition to AE meeting with a specific value (comparison, ROI, candidate preview)</li>
+        </ul>
+      </div>
+      <div class="list-card donts">
+        <h3>✕ Don't</h3>
+        <ul>
+          <li>Bash Indeed — sounds defensive and unprofessional</li>
+          <li>Discuss pricing details — that's the AE's role</li>
+          <li>Offer demos yourself — position the AE meeting as the next step</li>
+          <li>Assume Indeed isn't working — discover their actual experience first</li>
+          <li>Get into feature wars — focus on business outcomes and pain</li>
+          <li>Let "we use Indeed" stop the conversation — most clients use multiple channels</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="margin-top: 16px; background: var(--li-blue-light); border-color: var(--li-blue);">
+      <h3 style="color: var(--li-blue-dark);">🎯 Remember</h3>
+      <p>Your goal is to <strong>book the meeting</strong>, not close the deal. Create enough curiosity and uncover enough pain that the prospect wants to learn more. The AE handles pricing, demos, and closing.</p>
+    </div>
+  </section>
+</main>
+
+<footer>Indeed Competitive Battlecard · LinkedIn Sales Enablement · Q3 FY26 · Sources: SDR battlecards (FR &amp; UKI)</footer>
+
+<script>
+const DATA = {
+  weaknesses: [
+    { region: "uki", title: "Poor candidate quality", body: "Customers consistently report receiving irrelevant applications. One recruiter: less than 10% of applications would have been fit for interview.", quote: "I'd have a production controller role open and I'm getting production operators left, right and centre.", evidence: "Kraken Technology Group (Cade, 7:20)" },
+    { region: "uki", title: "Hidden costs & budget drain", body: "PPC model creates unpredictable costs. Customers tied into promotion add-ons, logo upgrades, video features — extras stack up fast.", quote: "If I was a competitor, I'd just be clicking on that for the fun of it.", evidence: "Jess/Leo - LinkedIn Talent Solutions (Jess, 4:17)" },
+    { region: "uki", title: "Time-consuming CV screening", body: "High volume of unqualified applicants — 200+ applications a week, only ~10% relevant.", quote: "You might get 200 applications, maybe 20 relevant — 10% of them.", evidence: "Independent Colleges (Owen, 1:42)" },
+    { region: "both", title: "Limited passive candidate access", body: "Indeed only reaches active seekers. The 70% of professionals quietly open to opportunities are out of reach.", quote: "Indeed relies on people applying — and not everyone has the ability of what you're looking for.", evidence: "LinkedIn meeting with Luana (Jamie, 1:40)" },
+    { region: "uki", title: "Geographic & qualification mismatches", body: "Applications arrive from completely irrelevant locations and skill sets, ignoring posting requirements.", quote: "90% of adverts were people coming from London for a Bradford job, from India, Pakistan, Italy — for a minimum wage warehouse role.", evidence: "Surgical Innovations (Marta, 10:57)" },
+    { region: "fr", title: "Pay-to-win bidding wars", body: "Even sponsored ads put SMEs against enterprise budgets. Whoever pays more wins visibility, regardless of fit.", evidence: "Cote x LinkedIn (Walid, 8:21)" }
+  ],
+
+  differentiators: [
+    { region: "fr", title: "1. Network size & professional focus", body: "LinkedIn has 37M users in France vs Indeed's 10M — 3–4× larger reach. Indeed users also have LinkedIn profiles, plus 27M extra professionals.", quote: "For specialized roles, that passive candidate pool is where you'll find your best hires.", evidence: "RDV : LinkedIn x TISEA (Adrien, 11:46)" },
+    { region: "fr", title: "2. Quality over quantity", body: "100% relevant applications vs Indeed's 20% relevance rate. Same role: Indeed delivered 25 apps / 5 qualified; LinkedIn delivered 4 apps / 4 qualified.", quote: "Would reducing time spent on unqualified candidates be valuable for your team?", evidence: "Brigitte et Valentin (Brigitte, 7:30)" },
+    { region: "both", title: "3. Active sourcing vs passive posting", body: "LinkedIn Recruiter enables proactive candidate hunting with 44 filters. Indeed is limited to passive job board posting.", quote: "For roles that are hard to fill or when you need someone quickly, our clients use LinkedIn's sourcing tools to proactively reach out — even those not actively looking.", evidence: "Sandrine et Mathieu (Mathieu, 12:21)" },
+    { region: "both", title: "4. Access to passive candidates", body: "LinkedIn's 'Open to Work' lets professionals signal interest while hiding it from their employer — a pool Indeed cannot reach.", quote: "These are your ideal candidates — qualified, employed, and discreetly exploring.", evidence: "Richard et Valentin (Valentin, 7:15)" },
+    { region: "fr", title: "5. Fair competition vs pay-to-win", body: "LinkedIn uses algorithm-based matching with fixed annual pricing. Indeed's CPC model favors the highest bidder.", quote: "Everyone pays the same, so SMEs aren't drowned out by enterprise companies.", evidence: "Cote x LinkedIn (Walid, 8:21)" },
+    { region: "fr", title: "6. Predictable costs vs variable spend", body: "Fixed annual pricing — you know exactly what you're investing upfront with no surprises. Customer was spending €24/day = €720/month on Indeed unpredictably.", evidence: "Dana - Lisa (Dana, 20:19)" },
+    { region: "uki", title: "7. Professional & senior-level talent", body: "LinkedIn is where professionals maintain their presence — particularly for higher-level positions.", quote: "I have found that LinkedIn helps more so for higher level positions.", evidence: "LinkedIn X Opusivs (Allison, 3:14)" },
+    { region: "uki", title: "8. Job slots = parking spaces", body: "Fixed-cost job slots. When one role is filled, post the next. No daily bidding wars, no per-click charges.", quote: "With £5,000 a month to post for job postings... that's a lot.", evidence: "Lisa and John (Lisa, 8:09)" }
+  ],
+
+  objections: [
+    { region: "both", title: "\"We're already using Indeed and it works fine\"", body: "Position LinkedIn as complementary. Most clients use Indeed for active seekers + LinkedIn for passive candidates.", quote: "Are there roles where Indeed isn't delivering enough qualified candidates, or where you're spending too much time sorting applications? Those are typically where LinkedIn adds the most value." },
+    { region: "both", title: "\"Indeed is cheaper than LinkedIn\"", body: "Shift from price to cost-per-qualified-candidate. One LinkedIn placement typically pays for the annual subscription if replacing agency fees (15–20% of salary).", quote: "When clients calculate cost-per-qualified-candidate, LinkedIn often comes out ahead because of the relevance.", evidence: "CAP ATLAS x LinkedIn (Endrit, 9:54)" },
+    { region: "fr", title: "\"We get lost among bigger companies even with sponsored ads\"", body: "LinkedIn's algorithm matches based on fit, not budget. Direct candidate notifications level the playing field for SMEs.", evidence: "Cote x LinkedIn (Clarisse, 7:34)" },
+    { region: "both", title: "\"Indeed delivers good volume of applications\"", body: "Challenge volume without quality. Quantify the time waste in sorting unqualified applications.", quote: "If I could show you how to get fewer applications but higher quality, would that save your team time?" },
+    { region: "fr", title: "\"We already have multiple recruitment subscriptions\"", body: "Position LinkedIn as consolidation. It can replace job board spend AND reduce agency fees — net cost reduction.", evidence: "Cote x LinkedIn (Clarisse, 2:42)" },
+    { region: "uki", title: "\"Our roles are too junior/blue-collar for LinkedIn\"", body: "LinkedIn has grown — over 8,000 care assistants in London alone are open to work. You can pre-qualify candidates before reaching out.", quote: "Rather than getting 200 applications from people who didn't read the job description." },
+    { region: "uki", title: "\"We don't have time to learn a new platform\"", body: "LinkedIn's AI does the searching for you 24/7. Customers report saving 30–40% of recruitment time.", quote: "You describe what you need, and it finds qualified candidates 24/7, even while you sleep." },
+    { region: "uki", title: "\"We need people to apply, not headhunt them\"", body: "LinkedIn offers both — job slots that promote roles + proactive sourcing when needed. Many use Indeed for high-volume + LinkedIn for professional roles." }
+  ],
+
+  discovery: [
+    { region: "both", title: "Map the landscape", body: "What recruitment channels are you currently using?", quote: "Non-threatening way to map the competitive landscape and learn about Indeed usage naturally." },
+    { region: "both", title: "Surface Indeed gaps", body: "How's Indeed working for you — what types of roles does it work well for, and where do you see gaps?", quote: "Uncovers specific pain points without criticizing Indeed." },
+    { region: "both", title: "Quantify quality problem", body: "When you post on Indeed, what percentage of applications are actually qualified for the role?", quote: "Quantifies the quality problem — creates awareness of time waste." },
+    { region: "both", title: "Surface time waste", body: "How much time does your team spend reviewing unqualified applications from job boards?", quote: "Quantifies the cost of poor targeting — creates urgency." },
+    { region: "both", title: "Find escalation to agencies", body: "For your harder-to-fill roles, are you finding candidates on Indeed, or do you end up using agencies?", quote: "Uncovers when they escalate to expensive agencies. Positions LinkedIn as the middle ground." },
+    { region: "both", title: "Reveal budget unpredictability", body: "What's your monthly spend on Indeed's sponsored ads, and how predictable is that cost?", quote: "Reveals budget concerns — sets up LinkedIn's fixed pricing advantage." },
+    { region: "both", title: "Active vs passive reach", body: "Are you reaching passive candidates — people employed but open — or mainly active job seekers?", quote: "Highlights Indeed's limitation. Creates curiosity about LinkedIn's passive access." },
+    { region: "uki", title: "Total recruitment spend", body: "What are you typically paying in agency fees? How many hires through agencies in the last year?", quote: "If you could bring some agency work in-house, would that be valuable?" },
+    { region: "uki", title: "Hiring velocity stakes", body: "What would it mean for your business if you could fill roles 30% faster?", quote: "Creates urgency and quantifies the value of speed." },
+    { region: "uki", title: "Surface decision-makers", body: "Who else in your organization cares about improving hiring quality and reducing costs?", quote: "Identifies multi-threading opportunities for the AE meeting." }
+  ],
+
+  proof: [
+    { region: "fr", title: "Candidate quality comparison", body: "Hospitality client posted a revenue management role. Indeed: 25 applications, 5 qualified. LinkedIn: 4 applications, all 4 qualified.", quote: "LinkedIn's algorithm and detailed job posting requirements filter out poor matches before they apply.", evidence: "Brigitte et Valentin (Brigitte, 7:30)" },
+    { region: "fr", title: "Time-to-hire improvement", body: "Manufacturing client took 4–5 months to fill operator positions on Indeed. After LinkedIn + ATS: 2–3 weeks. 85% reduction.", quote: "The difference was being able to proactively source rather than wait for applications.", evidence: "Marine et Mathieu (Marine, 6:31)" },
+    { region: "fr", title: "Network size advantage", body: "Indeed: ~10M users in France. LinkedIn: 37M (≈4× reach). Plus 27M professionals NOT on job boards.", quote: "For specialized roles, that's where you'll find your best candidates.", evidence: "TISEA (Adrien, 11:46)" },
+    { region: "fr", title: "Cost-per-qualified-candidate", body: "Client found Indeed CPC was lower, but they paid for 20 unqualified clicks per 1 qualified candidate. LinkedIn: every candidate pre-qualified by algorithm." },
+    { region: "fr", title: "Indeed insufficient for niche", body: "Engineering firm got only 'medium' results on Indeed for technical roles. Switched to LinkedIn sourcing — found passive engineers currently employed but open.", evidence: "Richard et Valentin (Richard, 3:42)" },
+    { region: "uki", title: "£5K/month Indeed spend", body: "Customer was spending £5,000/month on Indeed postings with poor results before discovering LinkedIn's fixed-cost job slots.", quote: "There's loads and loads of extra charges they add on.", evidence: "Lisa and John (Lisa, 9:10)" },
+    { region: "uki", title: "Quality + headhunt combo", body: "Recruiter added LinkedIn for headhunting — getting people that aren't available elsewhere. Indeed reached only those who happened to apply.", quote: "LinkedIn's obviously great for headhunting for getting people that might not be available elsewhere.", evidence: "Luana (Jamie, 1:40)" },
+    { region: "uki", title: "Agency replacement", body: "Customer realized agencies were charging them — and using LinkedIn anyway. Led them to bring recruitment in-house with LinkedIn directly.", quote: "I think they all used LinkedIn don't they... and they charge you for using it.", evidence: "FACTRA LTD (Shahid, 17:17)" }
+  ],
+
+  ctas: [
+    { region: "both", title: "1. The comparison approach", body: "Use when: prospect actively uses Indeed and mentions challenges.", quote: "Our AE can show you a side-by-side comparison using one of your actual open roles — candidate pool, targeting, cost. Typically a 20-minute conversation. Would [day/time] work?" },
+    { region: "both", title: "2. The consolidation approach", body: "Use when: prospect uses multiple recruitment tools including Indeed.", quote: "Many clients found they could consolidate to LinkedIn and actually reduce total recruitment spend. Would 20 minutes to see what consolidation looks like make sense?" },
+    { region: "fr", title: "3. The specialized roles approach", body: "Use when: prospect mentions hard-to-fill positions where Indeed isn't working.", quote: "Our AE can show you exactly how many qualified candidates are on LinkedIn in your area, what their profiles look like, and how you'd reach them. 20-min demo using your actual job requirements." },
+    { region: "both", title: "4. The passive candidate approach", body: "Use when: prospect needs to hire quickly or poach talent.", quote: "The candidates you're looking for are probably employed right now — they're not on Indeed posting resumes. LinkedIn gives you 'open to work' professionals keeping it quiet. 20 minutes to see this pool?" },
+    { region: "both", title: "5. The ROI calculation approach", body: "Use when: prospect is price-sensitive or comparing costs.", quote: "Our AE calculates cost-per-hire across all channels — Indeed, agencies, internal time. Most clients find one placement pays for the annual subscription when you factor in agency fees." },
+    { region: "fr", title: "6. The urgency approach", body: "Use when: prospect has urgent hiring needs.", quote: "Indeed's passive posting model means you wait for candidates. LinkedIn's sourcing lets you proactively reach qualified candidates today — even those not actively looking." },
+    { region: "uki", title: "7. The confident ask", body: "Standard close once pain is uncovered.", quote: "Based on what you've shared about [pain], it would be valuable to speak with [AE]. They can show you exactly how many qualified candidates are on LinkedIn for your [role type]. I have [day] at [time] or [day] at [time] — which works better?" },
+    { region: "uki", title: "8. The multi-stakeholder close", body: "Use when: prospect mentions a decision-maker.", quote: "Sounds like [decision maker] would want to see this too. Why don't we get you both on a call with [AE]? Who else should we include?" }
+  ]
+};
+
+const TABS = [
+  { id: "overview", label: "Overview" },
+  { id: "differentiators", label: "Differentiators", source: "differentiators" },
+  { id: "objections", label: "Objections", source: "objections" },
+  { id: "discovery", label: "Discovery Qs", source: "discovery" },
+  { id: "proof", label: "Proof Points", source: "proof" },
+  { id: "ctas", label: "Call-to-Action", source: "ctas" },
+  { id: "rules", label: "Do's & Don'ts" }
+];
+
+let currentRegion = "all";
+let currentSearch = "";
+
+function badge(region) {
+  if (region === "fr") return '<span class="badge badge-fr">🇫🇷 France</span>';
+  if (region === "uki") return '<span class="badge badge-uki">🇬🇧 UKI</span>';
+  return '<span class="badge badge-both">Global</span>';
+}
+
+function cardHTML(item) {
+  const parts = [];
+  parts.push(`<div class="card-head"><h3>${item.title}</h3>${badge(item.region)}</div>`);
+  if (item.body) parts.push(`<p>${item.body}</p>`);
+  if (item.quote) parts.push(`<div class="quote">"${item.quote}"</div>`);
+  if (item.evidence) parts.push(`<div class="evidence">${item.evidence}</div>`);
+  return `<div class="card" data-region="${item.region}" data-text="${(item.title + ' ' + (item.body||'') + ' ' + (item.quote||'')).toLowerCase().replace(/"/g,'&quot;')}">${parts.join('')}</div>`;
+}
+
+function render() {
+  // weaknesses (shown in overview)
+  document.getElementById('weaknesses').innerHTML = filterAndRender(DATA.weaknesses);
+  // tabs with content
+  ['differentiators','objections','discovery','proof','ctas'].forEach(key => {
+    document.getElementById(key).innerHTML = filterAndRender(DATA[key]) || '<div class="empty">No items match your filter. Try clearing search or switching region.</div>';
+  });
+  updateCounts();
+}
+
+function filterAndRender(items) {
+  const filtered = items.filter(item => {
+    const regionOK = currentRegion === "all" || item.region === currentRegion || item.region === "both";
+    const text = (item.title + ' ' + (item.body||'') + ' ' + (item.quote||'')).toLowerCase();
+    const searchOK = !currentSearch || text.includes(currentSearch);
+    return regionOK && searchOK;
+  });
+  return filtered.map(cardHTML).join('');
+}
+
+function updateCounts() {
+  TABS.forEach(t => {
+    if (!t.source) return;
+    const items = DATA[t.source].filter(item => {
+      const regionOK = currentRegion === "all" || item.region === currentRegion || item.region === "both";
+      const text = (item.title + ' ' + (item.body||'') + ' ' + (item.quote||'')).toLowerCase();
+      const searchOK = !currentSearch || text.includes(currentSearch);
+      return regionOK && searchOK;
+    });
+    const el = document.querySelector(`.tab[data-tab="${t.id}"] .tab-count`);
+    if (el) el.textContent = items.length;
+  });
+}
+
+// build tabs
+const tabsEl = document.getElementById('tabs');
+tabsEl.innerHTML = TABS.map((t, i) => {
+  const count = t.source ? `<span class="tab-count">${DATA[t.source].length}</span>` : '';
+  return `<button class="tab ${i===0?'active':''}" data-tab="${t.id}">${t.label}${count}</button>`;
+}).join('');
+
+tabsEl.addEventListener('click', e => {
+  const btn = e.target.closest('.tab');
+  if (!btn) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.panel[data-panel="${btn.dataset.tab}"]`).classList.add('active');
+});
+
+document.querySelector('.region-filter').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-region]');
+  if (!btn) return;
+  document.querySelectorAll('.region-filter button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRegion = btn.dataset.region;
+  render();
+});
+
+document.getElementById('search').addEventListener('input', e => {
+  currentSearch = e.target.value.toLowerCase().trim();
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
